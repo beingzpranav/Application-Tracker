@@ -1,0 +1,66 @@
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, ClipboardList, PlusCircle, Bell, Briefcase, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+
+const Navbar = ({ notificationCount }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const navItems = [
+    { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/applications', icon: ClipboardList, label: 'Applications' },
+    { to: '/add', icon: PlusCircle, label: 'Add New' },
+    { to: '/notifications', icon: Bell, label: 'Alerts', badge: notificationCount },
+  ];
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <nav className="floating-navbar">
+      <div className="navbar-inner">
+        {/* Brand */}
+        <NavLink to="/" className="navbar-brand">
+          <div className="brand-icon">
+            <Briefcase size={20} />
+          </div>
+          <span className="brand-name">JobTracker</span>
+        </NavLink>
+
+        {/* Nav Links */}
+        <div className="navbar-links">
+          {navItems.map(({ to, icon: Icon, label, badge }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) => `navbar-link ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={17} />
+              <span>{label}</span>
+              {badge > 0 && <span className="navbar-badge">{badge}</span>}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* User Section */}
+        <div className="navbar-user">
+          {user?.avatar ? (
+            <img src={user.avatar} alt={user.name} className="navbar-avatar" referrerPolicy="no-referrer" />
+          ) : (
+            <div className="navbar-avatar-placeholder">
+              {user?.name?.charAt(0) || '?'}
+            </div>
+          )}
+          <span className="navbar-username">{user?.name?.split(' ')[0]}</span>
+          <button className="navbar-logout" onClick={handleLogout} title="Logout">
+            <LogOut size={16} />
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: jobtracker-backend
+    env: node
+    region: singapore          # closest to India
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000            # Render assigns this automatically
+      - key: NODE_ENV
+        value: production
+      - key: RENDER_EXTERNAL_URL
+        fromService:
+          type: web
+          name: jobtracker-backend
+          property: host
+      # Set the rest manually in the Render dashboard:
+      # MONGODB_URI, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+      # GOOGLE_CALLBACK_URL, JWT_SECRET, SESSION_SECRET,
+      # FRONTEND_URL, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS,
+      # DEVELOPER_EMAIL, CLOUDFLARE_R2_*
