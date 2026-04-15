@@ -228,7 +228,7 @@ const LandingPage = () => {
   const [showFeedback, setShowFeedback] = useState(false)
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE.replace('/api', '')}/api/auth/google`
+    window.location.href = `${API_BASE}/auth/google`
   }
 
   const handleGoToApp = () => {
