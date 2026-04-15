@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /terms
+
+Disallow: /dashboard
+Disallow: /applications
+Disallow: /add
+Disallow: /notifications
+Disallow: /auth/
+
+Sitemap: https://jobtracker.pranavk.tech/sitemap.xml

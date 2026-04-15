@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, PlusCircle, Bell, Briefcase, LogOut } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, PlusCircle, Bell, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = ({ notificationCount }) => {
@@ -7,7 +7,7 @@ const Navbar = ({ notificationCount }) => {
   const navigate = useNavigate();
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/applications', icon: ClipboardList, label: 'Applications' },
     { to: '/add', icon: PlusCircle, label: 'Add New' },
     { to: '/notifications', icon: Bell, label: 'Alerts', badge: notificationCount },
@@ -22,10 +22,8 @@ const Navbar = ({ notificationCount }) => {
     <nav className="floating-navbar">
       <div className="navbar-inner">
         {/* Brand */}
-        <NavLink to="/" className="navbar-brand">
-          <div className="brand-icon">
-            <Briefcase size={20} />
-          </div>
+        <NavLink to="/dashboard" className="navbar-brand">
+          <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
           <span className="brand-name">JobTracker</span>
         </NavLink>
 

@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ToastContainer from './components/ToastContainer';
@@ -6,13 +11,14 @@ import Dashboard from './pages/Dashboard';
 import Applications from './pages/Applications';
 import AddApplication from './pages/AddApplication';
 import Notifications from './pages/Notifications';
-import Login from './pages/Login';
+import LandingPage from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { getNotifications } from './services/api';
 
-// Protected route wrapper
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -26,13 +32,13 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
-function AppContent() {
+function AppContent () {
   const { isAuthenticated } = useAuth();
   const [notificationCount, setNotificationCount] = useState(0);
 
@@ -52,36 +58,43 @@ function AppContent() {
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
+  const appLayout = (page) => (
+    <ProtectedRoute>
+      <div className="app-layout">
+        <Navbar notificationCount={notificationCount} />
+        <main className="main-content">
+          <div className="content-container">{page}</div>
+        </main>
+        <ToastContainer />
+      </div>
+    </ProtectedRoute>
+  );
+
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      {/* Public — landing page lives at the real root URL */}
+      <Route path="/" element={<LandingPage />} />
+
+      {/* Legacy /login redirect → / so old bookmarks / Google OAuth still work */}
+      <Route path="/login" element={<Navigate to="/" replace />} />
+
       <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute>
-            <div className="app-layout">
-              <Navbar notificationCount={notificationCount} />
-              <main className="main-content">
-                <div className="content-container">
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/applications" element={<Applications />} />
-                    <Route path="/add" element={<AddApplication />} />
-                    <Route path="/notifications" element={<Notifications />} />
-                  </Routes>
-                </div>
-              </main>
-              <ToastContainer />
-            </div>
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+
+      {/* Protected app routes */}
+      <Route path="/dashboard" element={appLayout(<Dashboard />)} />
+      <Route path="/applications" element={appLayout(<Applications />)} />
+      <Route path="/add" element={appLayout(<AddApplication />)} />
+      <Route path="/notifications" element={appLayout(<Notifications />)} />
+
+      {/* Catch-all: send unknown paths back to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
-function App() {
+function App () {
   return (
     <AuthProvider>
       <NotificationProvider>

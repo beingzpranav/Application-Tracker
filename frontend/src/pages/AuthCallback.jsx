@@ -11,9 +11,9 @@ const AuthCallback = () => {
     const token = searchParams.get('token');
     if (token) {
       login(token);
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } else {
-      navigate('/login?error=no_token', { replace: true });
+      navigate('/?error=no_token', { replace: true });
     }
   }, [searchParams, login, navigate]);
 

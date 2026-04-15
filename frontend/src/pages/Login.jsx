@@ -1,76 +1,24 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Briefcase, Activity, Calendar, FileText, Bell, Mail,
-  MessageSquare, X, Globe, Shield, BookOpen,
+  Activity, Calendar, FileText, Bell, Mail,
+  MessageSquare, X, Globe, Shield, BookOpen, Send, CheckCircle,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const GithubIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
   </svg>
-);
+)
 
 const LinkedinIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
-);
+)
 
-const PRIVACY_CONTENT = `Last updated: April 2026
-
-**1. Information We Collect**
-JobTracker collects only the information you provide through Google OAuth sign-in — your name, email address, and profile photo. We also store the job application data you manually enter into the app.
-
-**2. How We Use Your Data**
-Your data is used solely to provide the JobTracker service — tracking your job applications, generating analytics, and sending in-app reminders. We do not sell, trade, or share your personal data with third parties.
-
-**3. Data Storage**
-All data is stored securely in our MongoDB database hosted on a cloud provider. Resume files are stored in Cloudflare R2 with secure, signed URLs. We use industry-standard encryption for data in transit (HTTPS/TLS).
-
-**4. Cookies & Sessions**
-We use JSON Web Tokens (JWT) stored in your browser's local storage to maintain your session. No advertising cookies or third-party trackers are used.
-
-**5. Third-Party Services**
-We use Google OAuth for authentication and Cloudflare R2 for file storage. Your use of these services is governed by Google's and Cloudflare's respective privacy policies.
-
-**6. Data Deletion**
-You may request deletion of your account and all associated data at any time by emailing us. All data will be permanently removed within 7 business days.
-
-**7. Contact**
-If you have any questions about this Privacy Policy, please contact us at contact@pranav.tech.`;
-
-const TERMS_CONTENT = `Last updated: April 2026
-
-**1. Acceptance of Terms**
-By accessing and using JobTracker, you accept and agree to be bound by these Terms and Conditions. If you do not agree, please do not use the service.
-
-**2. Use of Service**
-JobTracker is provided for personal, non-commercial use. You agree not to misuse the platform, attempt to gain unauthorized access, or use it for any unlawful purpose.
-
-**3. User Accounts**
-You are responsible for maintaining the security of your account. We use Google OAuth for authentication — you must comply with Google's terms of service as well.
-
-**4. Intellectual Property**
-All content, branding, and code within JobTracker are the intellectual property of the developer. You may not reproduce, distribute, or create derivative works without explicit written permission.
-
-**5. Resume & File Uploads**
-Files you upload (resumes, documents) are stored securely and associated only with your account. You retain ownership of all files you upload. We do not access or process your documents.
-
-**6. Disclaimer of Warranties**
-JobTracker is provided "as is" without warranties of any kind. We do not guarantee uninterrupted service or that the platform will be free of errors.
-
-**7. Limitation of Liability**
-To the fullest extent permitted by law, the developer shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.
-
-**8. Changes to Terms**
-We reserve the right to update these Terms at any time. Continued use of the service after changes constitutes acceptance of the new Terms.
-
-**9. Contact**
-For questions about these Terms, please contact contact@pranav.tech.`;
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 const FEEDBACK_TYPES = [
   { label: 'General', emoji: '💬', color: '#6366f1' },
@@ -80,7 +28,7 @@ const FEEDBACK_TYPES = [
 
 const MAX_CHARS = 500
 
-const FeedbackModal = ({ onClose }) => {
+function FeedbackModal ({ onClose }) {
   const [form, setForm] = useState({
     name: '', email: '', type: 'General', message: '',
   })
@@ -116,13 +64,9 @@ const FeedbackModal = ({ onClose }) => {
   return (
     <div className="fb-overlay" onClick={onClose}>
       <div className="fb-modal" onClick={(e) => e.stopPropagation()}>
-
-        {/* Left panel */}
         <div className="fb-panel-left">
           <div className="fb-brand">
-            <div className="brand-icon" style={{ width: 40, height: 40 }}>
-              <Briefcase size={20} />
-            </div>
+            <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
             <span className="brand-name" style={{ fontSize: 18 }}>JobTracker</span>
           </div>
           <h2 className="fb-panel-title">We'd love your feedback</h2>
@@ -136,7 +80,11 @@ const FeedbackModal = ({ onClose }) => {
                 key={label}
                 type="button"
                 className={`fb-type-btn ${form.type === label ? 'fb-type-active' : ''}`}
-                style={form.type === label ? { borderColor: color, background: `${color}14` } : {}}
+                style={
+                  form.type === label
+                    ? { borderColor: color, background: `${color}14` }
+                    : {}
+                }
                 onClick={() => setForm({ ...form, type: label })}
               >
                 <span className="fb-type-emoji">{emoji}</span>
@@ -149,7 +97,6 @@ const FeedbackModal = ({ onClose }) => {
           </div>
         </div>
 
-        {/* Right panel */}
         <div className="fb-panel-right">
           <button className="fb-close" onClick={onClose} aria-label="Close">
             <X size={18} />
@@ -172,7 +119,14 @@ const FeedbackModal = ({ onClose }) => {
           ) : (
             <form className="fb-form" onSubmit={handleSubmit} noValidate>
               <div className="fb-form-header">
-                <span className="fb-type-tag" style={{ background: `${selectedType.color}18`, color: selectedType.color, border: `1px solid ${selectedType.color}33` }}>
+                <span
+                  className="fb-type-tag"
+                  style={{
+                    background: `${selectedType.color}18`,
+                    color: selectedType.color,
+                    border: `1px solid ${selectedType.color}33`,
+                  }}
+                >
                   {selectedType.emoji} {selectedType.label}
                 </span>
                 <h3>Share your thoughts</h3>
@@ -203,7 +157,9 @@ const FeedbackModal = ({ onClose }) => {
 
               <div className="fb-field">
                 <div className="fb-label-row">
-                  <label>Message <span style={{ color: '#ef4444' }}>*</span></label>
+                  <label>
+                    Message <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
                   <span className={`fb-chars ${charsLeft < 50 ? 'fb-chars-warn' : ''}`}>
                     {charsLeft}
                   </span>
@@ -266,56 +222,25 @@ const FeedbackModal = ({ onClose }) => {
   )
 }
 
-const LegalModal = ({ title, content, onClose }) => (
-  <div className="legal-modal-overlay" onClick={onClose}>
-    <div className="legal-modal" onClick={(e) => e.stopPropagation()}>
-      <div className="legal-modal-header">
-        <h2>{title}</h2>
-        <button className="legal-modal-close" onClick={onClose}>
-          <X size={20} />
-        </button>
-      </div>
-      <div className="legal-modal-body">
-        {content.split('\n\n').map((para, i) => {
-          if (para.startsWith('**') && para.endsWith('**')) {
-            return <h3 key={i}>{para.replace(/\*\*/g, '')}</h3>
-          }
-          const parts = para.split(/(\*\*[^*]+\*\*)/g)
-          return (
-            <p key={i}>
-              {parts.map((part, j) =>
-                part.startsWith('**') && part.endsWith('**')
-                  ? <strong key={j}>{part.replace(/\*\*/g, '')}</strong>
-                  : part
-              )}
-            </p>
-          )
-        })}
-      </div>
-    </div>
-  </div>
-)
-
 const LandingPage = () => {
-  const { loading, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [legalModal, setLegalModal] = useState(null);
-  const [showFeedback, setShowFeedback] = useState(false);
+  const { loading, isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+  const [showFeedback, setShowFeedback] = useState(false)
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE.replace('/api', '')}/api/auth/google`;
-  };
+    window.location.href = `${API_BASE.replace('/api', '')}/api/auth/google`
+  }
 
   const handleGoToApp = () => {
-    navigate('/');
-  };
+    navigate('/dashboard')
+  }
 
   if (loading) {
     return (
       <div className="landing-page loading">
         <div className="loading-spinner" />
       </div>
-    );
+    )
   }
 
   return (
@@ -324,12 +249,10 @@ const LandingPage = () => {
       <div className="landing-bg-orb orb-2" />
       <div className="landing-bg-orb orb-3" />
 
-      {/* Navbar for Landing */}
+      {/* Navbar */}
       <nav className="landing-nav">
         <div className="nav-brand">
-          <div className="brand-icon">
-            <Briefcase size={22} />
-          </div>
+          <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
           <span className="brand-name">JobTracker</span>
         </div>
         <div className="nav-actions">
@@ -345,7 +268,7 @@ const LandingPage = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="hero-section">
         <div className="hero-content">
           <div className="badge">✨ Supercharge your job search</div>
@@ -354,8 +277,9 @@ const LandingPage = () => {
             <span className="text-gradient">Your Career Journey</span>
           </h1>
           <p className="hero-subtitle">
-            Say goodbye to messy spreadsheets. JobTracker intelligently organizes your applications,
-            sends follow-up reminders, and gives you actionable insights to land your dream job faster.
+            Say goodbye to messy spreadsheets. JobTracker intelligently organizes
+            your applications, sends follow-up reminders, and gives you actionable
+            insights to land your dream job faster.
           </p>
           <div className="hero-actions">
             {isAuthenticated ? (
@@ -374,11 +298,13 @@ const LandingPage = () => {
               </button>
             )}
           </div>
-          <p className="hero-privacy">Free to use · Secure data · No credit card required</p>
+          <p className="hero-privacy">
+            Free to use · Secure data · No credit card required
+          </p>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section className="features-section" id="features">
         <h2 className="section-title">Everything you need to succeed</h2>
         <div className="features-grid">
@@ -405,15 +331,13 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer Section */}
+      {/* Footer */}
       <footer className="landing-footer">
         <div className="footer-top">
-          {/* Brand Column */}
+          {/* Brand */}
           <div className="footer-brand-col">
             <div className="footer-brand">
-              <div className="brand-icon small">
-                <Briefcase size={16} />
-              </div>
+              <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
               <span className="brand-name">JobTracker</span>
             </div>
             <p className="footer-tagline">
@@ -422,7 +346,7 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Product Column */}
+          {/* Product */}
           <div className="footer-col">
             <h4 className="footer-col-title">Product</h4>
             <ul className="footer-link-list">
@@ -433,12 +357,12 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          {/* Developer Column */}
+          {/* Developer */}
           <div className="footer-col">
             <h4 className="footer-col-title">Developer</h4>
             <ul className="footer-link-list">
               <li>
-                <a href="https://pranav.tech" target="_blank" rel="noreferrer">
+                <a href="https://pranavk.tech" target="_blank" rel="noreferrer">
                   <Globe size={14} />
                   Portfolio
                 </a>
@@ -456,33 +380,35 @@ const LandingPage = () => {
                 </a>
               </li>
               <li>
-                <a href="mailto:contact@pranav.tech">
+                <a href="mailto:contact@pranavk.tech">
                   <Mail size={14} />
-                  contact@pranav.tech
+                  contact@pranavk.tech
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Legal + Feedback Column */}
+          {/* Legal + Feedback */}
           <div className="footer-col">
             <h4 className="footer-col-title">Legal</h4>
             <ul className="footer-link-list">
               <li>
-                <button onClick={() => setLegalModal('privacy')} className="footer-link-btn">
+                <Link to="/privacy" className="footer-link-btn">
                   <Shield size={14} />
                   Privacy Policy
-                </button>
+                </Link>
               </li>
               <li>
-                <button onClick={() => setLegalModal('terms')} className="footer-link-btn">
+                <Link to="/terms" className="footer-link-btn">
                   <BookOpen size={14} />
                   Terms &amp; Conditions
-                </button>
+                </Link>
               </li>
             </ul>
 
-            <h4 className="footer-col-title" style={{ marginTop: '28px' }}>Feedback</h4>
+            <h4 className="footer-col-title" style={{ marginTop: '28px' }}>
+              Feedback
+            </h4>
             <button
               className="btn-feedback"
               onClick={() => setShowFeedback(true)}
@@ -496,38 +422,26 @@ const LandingPage = () => {
         <div className="footer-bottom">
           <p className="footer-bottom-copy">
             &copy; {new Date().getFullYear()} JobTracker. Built with ❤️ by{' '}
-            <a href="https://pranav.tech" target="_blank" rel="noreferrer">Pranav</a>.
-            All rights reserved.
+            <a href="https://pranavk.tech" target="_blank" rel="noreferrer">
+              Pranav
+            </a>
+            . All rights reserved.
           </p>
           <div className="footer-bottom-legal">
-            <button onClick={() => setLegalModal('privacy')} className="footer-link-btn">
+            <Link to="/privacy" className="footer-link-btn">
               Privacy Policy
-            </button>
+            </Link>
             <span className="footer-divider">·</span>
-            <button onClick={() => setLegalModal('terms')} className="footer-link-btn">
+            <Link to="/terms" className="footer-link-btn">
               Terms &amp; Conditions
-            </button>
+            </Link>
           </div>
         </div>
       </footer>
 
-      {legalModal === 'privacy' && (
-        <LegalModal
-          title="Privacy Policy"
-          content={PRIVACY_CONTENT}
-          onClose={() => setLegalModal(null)}
-        />
-      )}
-      {legalModal === 'terms' && (
-        <LegalModal
-          title="Terms &amp; Conditions"
-          content={TERMS_CONTENT}
-          onClose={() => setLegalModal(null)}
-        />
-      )}
       {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
     </div>
-  );
-};
+  )
+}
 
-export default LandingPage;
+export default LandingPage
