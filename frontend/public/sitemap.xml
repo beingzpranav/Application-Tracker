@@ -4,29 +4,22 @@
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
           http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 
-  <!-- Landing / Home -->
   <url>
-    <loc>https://jobtracker.pranavk.tech/</loc>
+    <loc>https://job-track.pranavk.tech/</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- App — requires auth, excluded from crawling but listed for completeness -->
-  <!-- robots.txt disallows /dashboard so crawlers won't index it -->
-
-
-  <!-- Privacy Policy -->
   <url>
-    <loc>https://jobtracker.pranavk.tech/privacy</loc>
+    <loc>https://job-track.pranavk.tech/privacy</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- Terms & Conditions -->
   <url>
-    <loc>https://jobtracker.pranavk.tech/terms</loc>
+    <loc>https://job-track.pranavk.tech/terms</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
