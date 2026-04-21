@@ -10,6 +10,12 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(() => localStorage.getItem('jt_token'));
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('jt_token');
+    setToken(null);
+    setUser(null);
+  }, []);
+
   // Fetch user info from token
   const fetchUser = useCallback(async (jwt) => {
     try {
@@ -30,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       // Do not logout on network errors, the backend might just be down temporarily
       return false;
     }
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
     if (token) {
@@ -40,15 +46,48 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token, fetchUser]);
 
-  const login = useCallback((jwt) => {
+  const login = useCallback(async (jwt) => {
     localStorage.setItem('jt_token', jwt);
     setToken(jwt);
-  }, []);
+    const ok = await fetchUser(jwt);
+    if (!ok) {
+      localStorage.removeItem('jt_token');
+      setToken(null);
+      setUser(null);
+    }
+    return ok;
+  }, [fetchUser]);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('jt_token');
-    setToken(null);
-    setUser(null);
+  const loginWithPassword = useCallback(async ({ usernameOrEmail, password }) => {
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usernameOrEmail, password }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Login failed');
+    }
+
+    await login(data.token);
+    return data;
+  }, [login]);
+
+  const registerWithPassword = useCallback(async ({ name, email, username, password }) => {
+    const res = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, username, password }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.message || 'Registration failed');
+    }
+
+    await login(data.token);
+    return data;
   }, []);
 
   const updateUser = useCallback((newData) => {
@@ -58,7 +97,19 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!user && !!token;
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated, login, logout, updateUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        isAuthenticated,
+        login,
+        loginWithPassword,
+        registerWithPassword,
+        logout,
+        updateUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

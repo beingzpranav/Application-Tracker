@@ -16,6 +16,7 @@ import Profile from './pages/Profile';
 import LandingPage from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
 import Privacy from './pages/Privacy';
+import ResetPassword from './pages/ResetPassword';
 import Terms from './pages/Terms';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -87,7 +88,10 @@ function AppContent () {
       <Route path="/" element={<LandingPage />} />
 
       {/* Legacy /login redirect → / so old bookmarks / Google OAuth still work */}
-      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/login" element={<LandingPage />} />
+      <Route path="/signup" element={<LandingPage />} />
+      <Route path="/forgot-password" element={<LandingPage />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/privacy" element={<Privacy />} />

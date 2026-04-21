@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   Activity, Calendar, FileText, Bell, Mail,
@@ -10,56 +10,59 @@ const GithubIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
   </svg>
-)
+);
 
 const LinkedinIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
-)
+);
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const MAX_CHARS = 500;
+const AUTH_MODES = {
+  LOGIN: 'login',
+  REGISTER: 'register',
+};
 
 const FEEDBACK_TYPES = [
   { label: 'General', emoji: '💬', color: '#6366f1' },
   { label: 'Bug Report', emoji: '🐛', color: '#ef4444' },
   { label: 'Feature Request', emoji: '✨', color: '#f59e0b' },
-]
-
-const MAX_CHARS = 500
+];
 
 function FeedbackModal ({ onClose }) {
   const [form, setForm] = useState({
     name: '', email: '', type: 'General', message: '',
-  })
-  const [sending, setSending] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState('')
+  });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
 
-  const charsLeft = MAX_CHARS - form.message.length
-  const isValid = form.message.trim().length >= 10
+  const charsLeft = MAX_CHARS - form.message.length;
+  const isValid = form.message.trim().length >= 10;
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!isValid) return
-    setSending(true)
-    setError('')
+    e.preventDefault();
+    if (!isValid) return;
+    setSending(true);
+    setError('');
     try {
       const res = await fetch(`${API_BASE}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
-      })
-      if (!res.ok) throw new Error('Failed')
-      setSent(true)
+      });
+      if (!res.ok) throw new Error('Failed');
+      setSent(true);
     } catch {
-      setError('Could not send. Please email contact@pranavk.tech directly.')
+      setError('Could not send. Please email contact@pranavk.tech directly.');
     } finally {
-      setSending(false)
+      setSending(false);
     }
-  }
+  };
 
-  const selectedType = FEEDBACK_TYPES.find((t) => t.label === form.type)
+  const selectedType = FEEDBACK_TYPES.find((t) => t.label === form.type);
 
   return (
     <div className="fb-overlay" onClick={onClose}>
@@ -80,11 +83,7 @@ function FeedbackModal ({ onClose }) {
                 key={label}
                 type="button"
                 className={`fb-type-btn ${form.type === label ? 'fb-type-active' : ''}`}
-                style={
-                  form.type === label
-                    ? { borderColor: color, background: `${color}14` }
-                    : {}
-                }
+                style={form.type === label ? { borderColor: color, background: `${color}14` } : {}}
                 onClick={() => setForm({ ...form, type: label })}
               >
                 <span className="fb-type-emoji">{emoji}</span>
@@ -107,10 +106,10 @@ function FeedbackModal ({ onClose }) {
               <div className="fb-success-icon">
                 <CheckCircle size={44} />
               </div>
-              <h3>Thank you! 🎉</h3>
+              <h3>Thank you.</h3>
               <p>
                 Your {form.type.toLowerCase()} has been received.
-                We read every message and truly appreciate you taking the time.
+                We read every message and appreciate the time you took.
               </p>
               <button className="btn btn-primary" onClick={onClose}>
                 Back to JobTracker
@@ -169,13 +168,13 @@ function FeedbackModal ({ onClose }) {
                     form.type === 'Bug Report'
                       ? 'Describe what happened and how to reproduce it...'
                       : form.type === 'Feature Request'
-                      ? 'Describe the feature and why it would be useful...'
-                      : 'Tell us what you think about JobTracker...'
+                        ? 'Describe the feature and why it would be useful...'
+                        : 'Tell us what you think about JobTracker...'
                   }
                   value={form.message}
                   onChange={(e) => {
                     if (e.target.value.length <= MAX_CHARS) {
-                      setForm({ ...form, message: e.target.value })
+                      setForm({ ...form, message: e.target.value });
                     }
                   }}
                   rows={5}
@@ -188,7 +187,7 @@ function FeedbackModal ({ onClose }) {
 
               {error && (
                 <div className="fb-error">
-                  <span>⚠️</span> {error}
+                  <span>Warning:</span> {error}
                 </div>
               )}
 
@@ -219,28 +218,311 @@ function FeedbackModal ({ onClose }) {
         </div>
       </div>
     </div>
-  )
+  );
+}
+
+function AuthModal ({ mode, onClose, onModeChange, onGoogleLogin, initialError = '' }) {
+  const navigate = useNavigate();
+  const { loginWithPassword, registerWithPassword } = useAuth();
+  const [loginForm, setLoginForm] = useState({ usernameOrEmail: '', password: '' });
+  const [registerForm, setRegisterForm] = useState({
+    name: '',
+    email: '',
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(initialError);
+
+  useEffect(() => {
+    setError(initialError);
+  }, [initialError, mode]);
+
+  const handleLoginSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+
+    try {
+      await loginWithPassword(loginForm);
+      onClose();
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+
+    if (registerForm.password !== registerForm.confirmPassword) {
+      setSubmitting(false);
+      setError('Passwords do not match');
+      return;
+    }
+
+    try {
+      await registerWithPassword({
+        name: registerForm.name,
+        email: registerForm.email,
+        username: registerForm.username,
+        password: registerForm.password,
+      });
+      onClose();
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const isLoginValid = loginForm.usernameOrEmail.trim() && loginForm.password;
+  const isRegisterValid =
+    registerForm.name.trim() &&
+    registerForm.email.trim() &&
+    registerForm.username.trim() &&
+    registerForm.password &&
+    registerForm.confirmPassword;
+
+  return (
+    <div className="auth-overlay" onClick={onClose}>
+      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="auth-panel auth-panel-brand">
+          <div className="fb-brand">
+            <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
+            <span className="brand-name" style={{ fontSize: 18 }}>JobTracker</span>
+          </div>
+          <span className="auth-eyebrow">Professional Job Tracking</span>
+          <h2 className="auth-title">
+            {mode === AUTH_MODES.LOGIN
+              ? 'Welcome back'
+              : 'Start tracking with clarity'}
+          </h2>
+          <p className="auth-copy">
+            {mode === AUTH_MODES.LOGIN
+              ? 'Sign in to manage applications, resumes, follow-ups, and your dashboard in one place.'
+              : 'Create an account to organize every application, track progress, and stay on top of follow-ups.'}
+          </p>
+        </div>
+
+        <div className="auth-panel auth-panel-form">
+          <button className="fb-close" onClick={onClose} aria-label="Close">
+            <X size={18} />
+          </button>
+
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={`auth-tab ${mode === AUTH_MODES.LOGIN ? 'auth-tab-active' : ''}`}
+              onClick={() => onModeChange(AUTH_MODES.LOGIN)}
+            >
+              Log In
+            </button>
+            <button
+              type="button"
+              className={`auth-tab ${mode === AUTH_MODES.REGISTER ? 'auth-tab-active' : ''}`}
+              onClick={() => onModeChange(AUTH_MODES.REGISTER)}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {mode === AUTH_MODES.LOGIN ? (
+            <form className="auth-form" onSubmit={handleLoginSubmit}>
+              <div className="fb-field">
+                <label>Username or Email</label>
+                <input
+                  type="text"
+                  placeholder="yourusername or you@example.com"
+                  value={loginForm.usernameOrEmail}
+                  onChange={(e) => setLoginForm({ ...loginForm, usernameOrEmail: e.target.value })}
+                  autoComplete="username"
+                />
+              </div>
+
+              <div className="fb-field">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={loginForm.password}
+                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                  autoComplete="current-password"
+                />
+              </div>
+
+              {error && <div className="fb-error">{error}</div>}
+
+              <div className="auth-actions">
+                <button
+                  type="submit"
+                  className="fb-submit auth-submit"
+                  disabled={submitting || !isLoginValid}
+                >
+                  {submitting ? 'Signing in...' : 'Log In'}
+                </button>
+                <button type="button" className="auth-google" onClick={onGoogleLogin}>
+                  Continue with Google
+                </button>
+              </div>
+              <button
+                type="button"
+                className="auth-text-link"
+                onClick={() => navigate('/forgot-password')}
+              >
+                Forgot your password?
+              </button>
+            </form>
+          ) : (
+            <form className="auth-form" onSubmit={handleRegisterSubmit}>
+              <div className="auth-grid">
+                <div className="fb-field">
+                  <label>Full Name</label>
+                  <input
+                    type="text"
+                    placeholder="Your full name"
+                    value={registerForm.name}
+                    onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
+                    autoComplete="name"
+                  />
+                </div>
+
+                <div className="fb-field">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={registerForm.email}
+                    onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              <div className="auth-grid">
+                <div className="fb-field">
+                  <label>Username</label>
+                  <input
+                    type="text"
+                    placeholder="yourusername"
+                    value={registerForm.username}
+                    onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value })}
+                    autoComplete="username"
+                  />
+                </div>
+
+                <div className="fb-field">
+                  <label>Password</label>
+                  <input
+                    type="password"
+                    placeholder="Create a password"
+                    value={registerForm.password}
+                    onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                    autoComplete="new-password"
+                  />
+                </div>
+              </div>
+
+              <div className="fb-field">
+                <label>Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder="Re-enter your password"
+                  value={registerForm.confirmPassword}
+                  onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {error && <div className="fb-error">{error}</div>}
+
+              <div className="auth-actions">
+                <button
+                  type="submit"
+                  className="fb-submit auth-submit"
+                  disabled={submitting || !isRegisterValid}
+                >
+                  {submitting ? 'Creating account...' : 'Create Account'}
+                </button>
+                <button type="button" className="auth-google" onClick={onGoogleLogin}>
+                  Continue with Google
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const LandingPage = () => {
-  const { loading, isAuthenticated } = useAuth()
-  const navigate = useNavigate()
-  const [showFeedback, setShowFeedback] = useState(false)
+  const { loading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState(AUTH_MODES.LOGIN);
+
+  useEffect(() => {
+    const requestedMode = location.pathname === '/signup'
+      ? AUTH_MODES.REGISTER
+      : searchParams.get('auth') === AUTH_MODES.REGISTER
+        ? AUTH_MODES.REGISTER
+        : AUTH_MODES.LOGIN;
+    const shouldOpenAuth =
+      location.pathname === '/login' ||
+      location.pathname === '/signup' ||
+      searchParams.get('auth') === AUTH_MODES.LOGIN ||
+      searchParams.get('auth') === AUTH_MODES.REGISTER ||
+      searchParams.get('error');
+
+    setAuthMode(requestedMode);
+    setShowAuth(Boolean(shouldOpenAuth));
+  }, [location.pathname, searchParams]);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${API_BASE}/auth/google`
-  }
+    window.location.href = `${API_BASE}/auth/google`;
+  };
 
   const handleGoToApp = () => {
-    navigate('/dashboard')
-  }
+    navigate('/dashboard');
+  };
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setShowAuth(true);
+  };
+
+  const closeAuth = () => {
+    setShowAuth(false);
+    if (
+      location.pathname === '/login' ||
+      location.pathname === '/signup' ||
+      searchParams.get('auth') ||
+      searchParams.get('error')
+    ) {
+      navigate('/', { replace: true });
+    }
+  };
+
+  const authError = searchParams.get('error') === 'auth_failed'
+    ? 'Google sign-in failed. You can try again or use username and password.'
+    : '';
 
   if (loading) {
     return (
       <div className="landing-page loading">
         <div className="loading-spinner" />
       </div>
-    )
+    );
   }
 
   return (
@@ -249,7 +531,6 @@ const LandingPage = () => {
       <div className="landing-bg-orb orb-2" />
       <div className="landing-bg-orb orb-3" />
 
-      {/* Navbar */}
       <nav className="landing-nav">
         <div className="nav-brand">
           <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
@@ -261,17 +542,16 @@ const LandingPage = () => {
               Go to Dashboard
             </button>
           ) : (
-            <button className="btn btn-ghost" onClick={handleGoogleLogin}>
+            <button className="btn btn-ghost" onClick={() => openAuth(AUTH_MODES.LOGIN)}>
               Log In
             </button>
           )}
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="hero-section">
         <div className="hero-content">
-          <div className="badge">✨ Supercharge your job search</div>
+          <div className="badge">Supercharge your job search</div>
           <h1 className="hero-title">
             The Smart Way to Track <br />
             <span className="text-gradient">Your Career Journey</span>
@@ -287,24 +567,24 @@ const LandingPage = () => {
                 Enter Application
               </button>
             ) : (
-              <button className="btn-google-large" onClick={handleGoogleLogin}>
-                <svg width="22" height="22" viewBox="0 0 48 48">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <span>Continue with Google</span>
+              <button className="btn btn-primary btn-lg" onClick={() => openAuth(AUTH_MODES.REGISTER)}>
+                Get Started
               </button>
             )}
           </div>
+          {!isAuthenticated && (
+            <div className="hero-alt-login">
+              <button className="hero-google-link" onClick={() => openAuth(AUTH_MODES.LOGIN)}>
+                Already have an account? Log in
+              </button>
+            </div>
+          )}
           <p className="hero-privacy">
             Free to use · Secure data · No credit card required
           </p>
         </div>
       </section>
 
-      {/* Features */}
       <section className="features-section" id="features">
         <h2 className="section-title">Everything you need to succeed</h2>
         <div className="features-grid">
@@ -331,10 +611,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="landing-footer">
         <div className="footer-top">
-          {/* Brand */}
           <div className="footer-brand-col">
             <div className="footer-brand">
               <img src="/Logo.png" alt="JobTracker" className="navbar-logo" />
@@ -346,7 +624,6 @@ const LandingPage = () => {
             </p>
           </div>
 
-          {/* Product */}
           <div className="footer-col">
             <h4 className="footer-col-title">Product</h4>
             <ul className="footer-link-list">
@@ -357,7 +634,6 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          {/* Developer */}
           <div className="footer-col">
             <h4 className="footer-col-title">Developer</h4>
             <ul className="footer-link-list">
@@ -388,7 +664,6 @@ const LandingPage = () => {
             </ul>
           </div>
 
-          {/* Legal + Feedback */}
           <div className="footer-col">
             <h4 className="footer-col-title">Legal</h4>
             <ul className="footer-link-list">
@@ -421,7 +696,7 @@ const LandingPage = () => {
 
         <div className="footer-bottom">
           <p className="footer-bottom-copy">
-            &copy; {new Date().getFullYear()} JobTracker. Built with ❤️ by{' '}
+            &copy; {new Date().getFullYear()} JobTracker. Built by{' '}
             <a href="https://pranavk.tech" target="_blank" rel="noreferrer">
               Pranav
             </a>
@@ -440,8 +715,17 @@ const LandingPage = () => {
       </footer>
 
       {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
+      {showAuth && (
+        <AuthModal
+          mode={authMode}
+          onClose={closeAuth}
+          onModeChange={setAuthMode}
+          onGoogleLogin={handleGoogleLogin}
+          initialError={authError}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;
