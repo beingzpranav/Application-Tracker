@@ -23,7 +23,7 @@ const sendMail = async ({ to, subject, html }) => {
   try {
     const transporter = createTransporter();
     await transporter.sendMail({
-      from: `"JobTracker" <${process.env.SMTP_USER}>`,
+      from: `"alerts JobTracker" <${process.env.SMTP_USER}>`,
       to,
       subject,
       html,

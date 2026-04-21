@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Clock, ChevronDown, ExternalLink, FileText, Plus } from 'lucide-react';
+import { Search, Filter, Clock, ChevronDown, ExternalLink, FileText, Plus, Star } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
 import PriorityBadge from '../components/PriorityBadge';
-import ApplicationModal from '../components/ApplicationModal';
 import { getApplications, updateApplication, deleteApplication } from '../services/api';
 import { useNotifications } from '../context/NotificationContext';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +12,7 @@ const Applications = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
+  const [bookmarkedFilter, setBookmarkedFilter] = useState(false);
   const [sort, setSort] = useState('newest');
   const [selectedApp, setSelectedApp] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -21,7 +21,7 @@ const Applications = () => {
 
   useEffect(() => {
     fetchApplications();
-  }, [statusFilter, priorityFilter, sort, search]);
+  }, [statusFilter, priorityFilter, bookmarkedFilter, sort, search]);
 
   const fetchApplications = async () => {
     try {
@@ -29,6 +29,7 @@ const Applications = () => {
       if (search) params.search = search;
       if (statusFilter !== 'All') params.status = statusFilter;
       if (priorityFilter !== 'All') params.priority = priorityFilter;
+      if (bookmarkedFilter) params.bookmarked = 'true';
       if (sort) params.sort = sort;
       const res = await getApplications(params);
       setApplications(res.data);
@@ -69,9 +70,23 @@ const Applications = () => {
 
   if (loading) {
     return (
-      <div className="page-loading">
-        <div className="loading-spinner" />
-        <p>Loading applications...</p>
+      <div className="applications-page">
+        <div className="page-header" style={{ marginBottom: '24px' }}>
+          <div>
+            <div className="skeleton skeleton-title" style={{ width: '150px', marginBottom: '8px' }}></div>
+            <div className="skeleton skeleton-text" style={{ width: '80px', margin: 0 }}></div>
+          </div>
+          <div className="skeleton" style={{ width: '100px', height: '40px', borderRadius: '2px' }}></div>
+        </div>
+        <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
+          <div className="skeleton" style={{ flex: 1, height: '44px', borderRadius: '2px' }}></div>
+          <div className="skeleton" style={{ width: '100px', height: '44px', borderRadius: '2px' }}></div>
+        </div>
+        <div className="skeleton skeleton-row"></div>
+        <div className="skeleton skeleton-row"></div>
+        <div className="skeleton skeleton-row"></div>
+        <div className="skeleton skeleton-row"></div>
+        <div className="skeleton skeleton-row"></div>
       </div>
     );
   }
@@ -108,6 +123,14 @@ const Applications = () => {
           <Filter size={15} />
           Filters
           <ChevronDown size={13} style={{ transform: showFilters ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
+        </button>
+        <button
+          className={`btn btn-ghost filter-toggle ${bookmarkedFilter ? 'active' : ''}`}
+          onClick={() => setBookmarkedFilter(!bookmarkedFilter)}
+          style={{ color: bookmarkedFilter ? 'var(--accent-green)' : 'inherit' }}
+        >
+          <Star size={15} fill={bookmarkedFilter ? 'var(--accent-green)' : 'none'} />
+          Starred
         </button>
       </div>
 
@@ -173,11 +196,16 @@ const Applications = () => {
                   <tr
                     key={app._id}
                     className={`table-row ${isFollowUpDue(app) ? 'row-followup' : ''}`}
-                    onClick={() => setSelectedApp(app)}
+                    onClick={() => navigate(`/applications/${app._id}`, { state: { app } })}
                   >
                     <td className="td-company">
-                      <div className="company-avatar">{app.company.charAt(0).toUpperCase()}</div>
-                      <span>{app.company}</span>
+                      <div className="company-avatar" style={{ border: app.bookmarked ? '2px solid var(--accent-green)' : '' }}>
+                        {app.company.charAt(0).toUpperCase()}
+                      </div>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {app.company}
+                        {app.bookmarked && <Star size={14} fill="var(--accent-green)" color="var(--accent-green)" />}
+                      </span>
                     </td>
                     <td className="td-role">{app.role}</td>
                     <td><StatusBadge status={app.status} /></td>
@@ -216,13 +244,18 @@ const Applications = () => {
               <div
                 key={app._id}
                 className={`app-card ${isFollowUpDue(app) ? 'app-card-followup' : ''}`}
-                onClick={() => setSelectedApp(app)}
+                onClick={() => navigate(`/applications/${app._id}`, { state: { app } })}
               >
                 <div className="app-card-header">
                   <div className="app-card-company">
-                    <div className="company-avatar">{app.company.charAt(0).toUpperCase()}</div>
+                    <div className="company-avatar" style={{ border: app.bookmarked ? '2px solid var(--accent-green)' : '' }}>
+                      {app.company.charAt(0).toUpperCase()}
+                    </div>
                     <div>
-                      <div className="app-card-company-name">{app.company}</div>
+                      <div className="app-card-company-name" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {app.company}
+                        {app.bookmarked && <Star size={14} fill="var(--accent-green)" color="var(--accent-green)" />}
+                      </div>
                       <div className="app-card-role">{app.role}</div>
                     </div>
                   </div>
@@ -256,15 +289,6 @@ const Applications = () => {
             ))}
           </div>
         </>
-      )}
-
-      {selectedApp && (
-        <ApplicationModal
-          application={selectedApp}
-          onClose={() => setSelectedApp(null)}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-        />
       )}
     </div>
   );

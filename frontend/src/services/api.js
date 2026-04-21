@@ -86,4 +86,16 @@ export const deleteResume = (id) => api.delete(`/applications/${id}/resume`);
 export const getStats = () => api.get('/applications/stats');
 export const getNotifications = () => api.get('/applications/notifications');
 
+// Auth
+export const registerUser = (data) => api.post('/auth/register', data);
+export const loginUser = (data) => api.post('/auth/login', data);
+export const updateProfile = (data) => api.put('/auth/profile', data);
+export const uploadAvatar = (file) => {
+  const formData = new FormData();
+  formData.append('avatar', file);
+  return api.post('/auth/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+
 export default api;

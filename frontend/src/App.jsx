@@ -10,7 +10,9 @@ import ToastContainer from './components/ToastContainer';
 import Dashboard from './pages/Dashboard';
 import Applications from './pages/Applications';
 import AddApplication from './pages/AddApplication';
+import ApplicationDetails from './pages/ApplicationDetails';
 import Notifications from './pages/Notifications';
+import Profile from './pages/Profile';
 import LandingPage from './pages/Login';
 import AuthCallback from './pages/AuthCallback';
 import Privacy from './pages/Privacy';
@@ -24,9 +26,18 @@ const ProtectedRoute = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="page-loading" style={{ minHeight: '100vh' }}>
-        <div className="loading-spinner" />
-        <p>Loading...</p>
+      <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
+          <div className="skeleton" style={{ width: '120px', height: '32px' }}></div>
+          <div className="skeleton" style={{ width: '40px', height: '40px', borderRadius: '50%' }}></div>
+        </div>
+        <div className="skeleton skeleton-title" style={{ width: '250px' }}></div>
+        <div className="skeleton-grid">
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+        </div>
       </div>
     );
   }
@@ -85,8 +96,10 @@ function AppContent () {
       {/* Protected app routes */}
       <Route path="/dashboard" element={appLayout(<Dashboard />)} />
       <Route path="/applications" element={appLayout(<Applications />)} />
+      <Route path="/applications/:id" element={appLayout(<ApplicationDetails />)} />
       <Route path="/add" element={appLayout(<AddApplication />)} />
       <Route path="/notifications" element={appLayout(<Notifications />)} />
+      <Route path="/profile" element={appLayout(<Profile />)} />
 
       {/* Catch-all: send unknown paths back to home */}
       <Route path="*" element={<Navigate to="/" replace />} />

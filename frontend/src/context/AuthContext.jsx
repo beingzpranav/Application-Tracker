@@ -20,12 +20,14 @@ export const AuthProvider = ({ children }) => {
         const data = await res.json();
         setUser(data);
         return true;
-      } else {
+      } else if (res.status === 401) {
         logout();
         return false;
       }
-    } catch {
-      logout();
+      return false;
+    } catch (error) {
+      console.error('Network error during fetchUser', error);
+      // Do not logout on network errors, the backend might just be down temporarily
       return false;
     }
   }, []);
@@ -49,10 +51,14 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((newData) => {
+    setUser((prev) => ({ ...prev, ...newData }));
+  }, []);
+
   const isAuthenticated = !!user && !!token;
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, isAuthenticated, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

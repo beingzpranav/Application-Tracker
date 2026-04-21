@@ -62,6 +62,10 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    bookmarked: {
+      type: Boolean,
+      default: false,
+    },
     lastUpdated: {
       type: Date,
       default: Date.now,

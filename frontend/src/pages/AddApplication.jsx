@@ -90,8 +90,8 @@ const AddApplication = () => {
         </div>
       </div>
 
-      <form className="add-form" onSubmit={handleSubmit}>
-        <div className="form-card">
+      <form className="add-form" onSubmit={handleSubmit} style={{ maxWidth: 800, margin: '0 auto' }}>
+        <div className="bento-card">
           <div className="form-grid">
             <div className="form-group">
               <label htmlFor="company">Company Name *</label>

@@ -24,3 +24,9 @@ dist-ssr
 *.sw?
 
 .env
+
+.env.local
+.env.example
+.env.*
+DEPLOYMENT.md
+DESIGN.md

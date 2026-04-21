@@ -35,9 +35,18 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="page-loading">
-        <div className="loading-spinner" />
-        <p>Loading dashboard...</p>
+      <div className="dashboard-page">
+        <div className="skeleton skeleton-title" style={{ width: '200px', marginBottom: '24px' }}></div>
+        <div className="skeleton-grid">
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+          <div className="skeleton skeleton-card"></div>
+        </div>
+        <div className="charts-row">
+          <div className="skeleton skeleton-chart"></div>
+          <div className="skeleton skeleton-chart"></div>
+        </div>
       </div>
     );
   }
@@ -53,12 +62,10 @@ const Dashboard = () => {
   }
 
   const statsCards = [
-    { title: 'Total Applications', value: stats.total, icon: Briefcase, color: '#6366f1' },
-    { title: 'Interviews', value: stats.interviews, icon: Users, color: '#f59e0b' },
-    { title: 'Offers', value: stats.offers, icon: Trophy, color: '#10b981' },
-    { title: 'Rejections', value: stats.rejections, icon: XCircle, color: '#ef4444' },
-    { title: 'Response Rate', value: `${stats.responseRate}%`, icon: TrendingUp, color: '#8b5cf6' },
-    { title: 'Offer Rate', value: `${stats.offerRate}%`, icon: Target, color: '#06b6d4' },
+    { title: 'Active Apps', value: stats.total, icon: Briefcase, color: '#76b900', trend: 3 },
+    { title: 'Interviews', value: stats.interviews, icon: Users, color: '#1eaedb', subtitle: 'Scheduled' },
+    { title: 'Offers', value: stats.offers, icon: Trophy, color: '#3f8500', subtitle: 'Pending Review' },
+    { title: 'Archived', value: stats.rejections, icon: TrendingUp, color: '#ef9100', subtitle: 'Past 30 days' },
   ];
 
   const RADIAN = Math.PI / 180;
@@ -85,19 +92,13 @@ const Dashboard = () => {
 
       {/* Alert Banner */}
       {(stats.followUpAlerts > 0 || stats.staleWarnings > 0) && (
-        <div className="alert-banner">
-          {stats.followUpAlerts > 0 && (
-            <div className="alert-item alert-followup">
-              <Clock size={18} />
-              <span>{stats.followUpAlerts} application(s) need follow-up</span>
-            </div>
-          )}
-          {stats.staleWarnings > 0 && (
-            <div className="alert-item alert-stale">
-              <AlertTriangle size={18} />
-              <span>{stats.staleWarnings} application(s) with no response in 10+ days</span>
-            </div>
-          )}
+        <div className="alert-banner" style={{ background: '#000000', border: '1px solid #333333', borderLeft: '4px solid #f59e0b', color: '#e2e8f0', borderRadius: '2px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+          <Clock size={20} color="#f59e0b" strokeWidth={2.5} />
+          <span style={{ fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px' }}>
+            {stats.followUpAlerts > 0 && `${stats.followUpAlerts} application(s) need follow-up `}
+            {stats.followUpAlerts > 0 && stats.staleWarnings > 0 && ' • '}
+            {stats.staleWarnings > 0 && `${stats.staleWarnings} application(s) have been stale for 10+ days`}
+          </span>
         </div>
       )}
 
@@ -110,7 +111,7 @@ const Dashboard = () => {
 
       {/* Charts Row */}
       <div className="charts-row">
-        <div className="chart-card">
+        <div className="chart-card" style={{ background: '#000000', border: '1px solid #333333', borderRadius: '2px' }}>
           <h3>Weekly Applications</h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={stats.weeklyData}>
@@ -136,7 +137,7 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        <div className="chart-card">
+        <div className="chart-card" style={{ background: '#000000', border: '1px solid #333333', borderRadius: '2px' }}>
           <h3>Status Distribution</h3>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>

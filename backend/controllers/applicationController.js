@@ -5,8 +5,12 @@ const { uploadToR2, deleteFromR2 } = require('../config/cloudflare');
 // @route   GET /api/applications
 const getApplications = async (req, res) => {
   try {
-    const { status, priority, search, sort } = req.query;
+    const { status, priority, search, sort, bookmarked } = req.query;
     let query = { user: req.user._id };
+
+    if (bookmarked === 'true') {
+      query.bookmarked = true;
+    }
 
     // Filter by status
     if (status && status !== 'All') {
@@ -104,7 +108,7 @@ const updateApplication = async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    const { company, role, status, notes, priority, dateApplied, jobUrl } = req.body;
+    const { company, role, status, notes, priority, dateApplied, jobUrl, bookmarked } = req.body;
 
     // Track status change in activity log
     if (status && status !== application.status) {
@@ -132,6 +136,7 @@ const updateApplication = async (req, res) => {
     if (notes !== undefined) application.notes = notes;
     if (priority) application.priority = priority;
     if (jobUrl !== undefined) application.jobUrl = jobUrl;
+    if (bookmarked !== undefined) application.bookmarked = bookmarked;
     if (dateApplied) {
       application.dateApplied = dateApplied;
       // Recalculate follow-up date
